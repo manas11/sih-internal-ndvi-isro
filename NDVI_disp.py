@@ -52,15 +52,15 @@ def generate_ndvi(path1, path2, title):
 def main():
     path1_1 = '../Clipped_NDVI/awifs_ndvi_201701_15_1_clipped.tif'
     path1_2 = '../Clipped_NDVI/awifs_ndvi_201701_15_2_clipped.tif'
-    title1 = 'barren'
+    title1 = 'Barren'
 
     path2_1 = '../Clipped_NDVI/awifs_ndvi_201707_15_1_clipped.tif'
     path2_2 = '../Clipped_NDVI/awifs_ndvi_201707_15_2_clipped.tif'
-    title2 = 'peak1'
+    title2 = 'First Peak'
 
     path3_1 = '../Clipped_NDVI/awifs_ndvi_201808_15_1_clipped.tif'
     path3_2 = '../Clipped_NDVI/awifs_ndvi_201808_15_2_clipped.tif'
-    title3 = 'peak2'
+    title3 = 'Second Peak'
 
     generate_ndvi(path1_1, path1_2, title1)
     generate_ndvi(path2_1, path2_2, title2)
