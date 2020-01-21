@@ -11,6 +11,7 @@ import matplotlib.dates as mdates
 import seaborn as sns
 import numpy as np
 from scipy.signal import argrelextrema
+from scipy.ndimage import gaussian_filter
 import random
 
 def convert(f1,f2):
@@ -35,7 +36,7 @@ def convert(f1,f2):
 				ctr=ctr+j;
 				n=n+1
 	print('----------')
-	return ctr
+	return (ctr)
 
 
 
@@ -51,6 +52,9 @@ def plot(values):
 			ndvis[i+1] = ((ndvis[i] + ndvis[i+2])/2.0)
 	c = pd.Series(ndvis, index=a)
 	ax.plot(c.index, c, label = "line 2")
+	c_gaus = gaussian_filter(c, sigma=1.2)
+	ax.plot(c.index, c, label="line 2")
+	ax.plot(c.index, c_gaus, label="line 3")
 	# t = [random.random()*1000 for _ in range(24)]
 	# d = pd.Series(t, index=a)
 	# ax.plot(d.index, d, label = "line 3")
@@ -69,7 +73,7 @@ def smooth(y, box_pts):
 	
 
 def main():
-	files = glob.glob("/home/stark/SIH/sih-isro/Clipped_NDVI/*")
+	files = glob.glob("/home/bharath/Desktop/Clipped_NDVI/*")
 	files.sort()
 	print(files)
 	n = len(files)

@@ -50,7 +50,10 @@ def plot(values):
 		if abs(ndvis[i+1]-ndvis[i]) <= 0.20*ndvis[i]:
 			ndvis[i+1] = ((ndvis[i] + ndvis[i+2])/2.0)
 	c = pd.Series(ndvis, index=a)
+
 	ax.plot(c.index, c, label = "line 2")
+
+	# ax.plot(c.index, chat, label = "line 3")
 	# t = [random.random()*1000 for _ in range(24)]
 	# d = pd.Series(t, index=a)
 	# ax.plot(d.index, d, label = "line 3")
