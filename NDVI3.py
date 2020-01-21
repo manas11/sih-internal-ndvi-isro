@@ -28,13 +28,13 @@ def convert(f1,f2):
 	# print('----------')
 	# print(ndvi)
 	ctr=0
+	n=0
 	for i in ndvi:
 		for j in i:
 			if j>=0.3:
 				ctr=ctr+j;
-
+				n=n+1
 	print('----------')
-	print(ctr)
 	return ctr
 
 
@@ -45,6 +45,7 @@ def plot(values):
 	fig, ax = plt.subplots()
 	ax.plot(b.index, b, label = "line 1")
 	ndvis = values
+
 	for i in range(0,len(ndvis)-2):
 		if abs(ndvis[i+1]-ndvis[i]) <= 0.20*ndvis[i]:
 			ndvis[i+1] = ((ndvis[i] + ndvis[i+2])/2.0)
@@ -53,14 +54,22 @@ def plot(values):
 	# t = [random.random()*1000 for _ in range(24)]
 	# d = pd.Series(t, index=a)
 	# ax.plot(d.index, d, label = "line 3")
-	ax.legend()	
+	ax.legend()
 
 	ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
 	plt.show()
+	tf= np.array(ndvis)
+	print(tf)
+
+
+def smooth(y, box_pts):
+	box = np.ones(box_pts)/box_pts
+	y_smooth = np.convolve(y, box, mode='same')
+	return y_smooth
 	
 
 def main():
-	files = glob.glob("/home/stark/SIH/NDVI/NDVI/Clipped_NDVI/*")
+	files = glob.glob("/home/stark/SIH/sih-isro/Clipped_NDVI/*")
 	files.sort()
 	print(files)
 	n = len(files)
@@ -72,6 +81,8 @@ def main():
 	print("NDVI VALUES")		
 	print(ndvis)
 	plot(ndvis)
+	print('-----')
+	
 
 
 if __name__ == "__main__": 
