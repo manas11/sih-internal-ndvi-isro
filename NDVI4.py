@@ -33,14 +33,15 @@ def convert(f1,f2):
 	n=0
 	for i in ndvi:
 		for j in i:
+			n = n+1
 			if j>=0.3:
 				ctr=ctr+j;
-				n=n+1
-	return (ctr)
+	return ctr, n
 
 def plot(values):
 
-	a = pd.date_range(start='15/1/2017', end='15/01/2019', freq = 'M')
+	extra = pd.date_range(start='15/1/2017', end='15/01/2019', freq = 'M')
+	a = pd.date_range('2017-01-01', periods=len(values), freq='MS') + pd.DateOffset(days=14)
 	b = pd.Series(values, index=a)
 	peaks_raw = crop_parameters(values)
 	np_values = np.array(values)
@@ -102,8 +103,8 @@ def plot(values):
 
 
 	sleep = input("Press any key to Continue")
-
-	decomposition = sm.tsa.seasonal_decompose(d, model = 'additive')
+	e = pd.Series(c_gaus_list, index=extra)
+	decomposition = sm.tsa.seasonal_decompose(e, model = 'additive')
 	fig = decomposition.seasonal.plot()
 	matplotlib.rcParams['figure.figsize'] = [9.0, 5.0]
 	plt.show()
@@ -119,14 +120,21 @@ def main():
 	files.sort()
 	n = len(files)
 	ndvis = []
+	crop_percentage = []
 	print('PROCESSING FILES AND CONVERTING IT TO NDVI')
 	for i in range(0,n,2):
 		# print('Files are = ',files[i],files[i+1])
-		ndvis.append(convert(files[i],files[i+1]))
+		x,y = convert(files[i],files[i+1])
+		ndvis.append(x)
+		crop_percentage.append((x/y)*100)
 
 	plot(ndvis)
 	print('-----')
-	
+	a = pd.date_range('2017-01-01', periods=len(ndvis), freq='MS') + pd.DateOffset(days=14)
+	b = pd.Series(crop_percentage, index=a)
+	print('CROP PERCENTAGE')
+	print(b)
+
 
 
 if __name__ == "__main__": 
