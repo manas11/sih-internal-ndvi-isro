@@ -9,12 +9,14 @@ import matplotlib.pyplot as plt
 from matplotlib.dates import DateFormatter
 import matplotlib.dates as mdates
 import seaborn as sns
-import numpy as np
 from scipy.signal import argrelextrema
 from scipy.ndimage import gaussian_filter
 import random
 from scipy.signal import find_peaks
 from scipy.signal import argrelextrema
+import statsmodels.api as sm
+import matplotlib
+from statsmodels.tsa.seasonal import seasonal_decompose
 
 
 def convert(f1,f2):
@@ -39,8 +41,7 @@ def convert(f1,f2):
 
 
 def plot(values):
-	# Raw Data
-	#a = pd.DatetimeIndex(start='2016-12-15',end='2018-12-15' , freq='M')
+
 	a = pd.date_range(start='15/1/2017', end='15/01/2019', freq = 'M')
 	b = pd.Series(values, index=a)
 	peaks_raw = crop_parameters(values)
@@ -54,6 +55,8 @@ def plot(values):
 	print('Raw Data')
 	print('Number of Harvests raw data = ', a[peaks_raw])
 	print('Minimas Raw =', a[minima_raw])
+
+	sleep = input("Press any key to Continue")
 
 
 
@@ -76,13 +79,16 @@ def plot(values):
 	print('Minimas 20% =', a[minima_20])
 
 
+	sleep = input("Press any key to Continue")
+
 	# Applying Gaussian Distribution
 	c_gaus = gaussian_filter(c, sigma=1.3)
 	c_gaus_list = c_gaus.tolist()
+	d = pd.Series(c_gaus_list, index=a)
 	minima_gauss = argrelextrema(np.array(c_gaus_list), np.less)
 	peaks_gaus = crop_parameters(c_gaus_list)
 	fig, cx = plt.subplots()
-	cx.plot(c.index, c_gaus_list, label="Gaussian")
+	cx.plot(d.index, d, label="Gaussian")
 	cx.plot(a[peaks_gaus], c_gaus[peaks_gaus], "x")
 	cx.plot(a[minima_gauss], c_gaus[minima_gauss], "o")
 	plt.show()
@@ -90,6 +96,30 @@ def plot(values):
 	print('Peaks after gaussian_filter = ', a[peaks_gaus])
 	print('Minimas Gaus =', a[minima_gauss])
 
+	sleep = input("Press any key to Continue")
+
+	decomposition = sm.tsa.seasonal_decompose(b, model = 'additive')
+	fig = decomposition.plot()
+	matplotlib.rcParams['figure.figsize'] = [9.0, 5.0]
+	plt.show()
+
+	sleep = input("Press any key to Continue")
+
+	decomposition = sm.tsa.seasonal_decompose(c, model = 'additive')
+	fig = decomposition.plot()
+	matplotlib.rcParams['figure.figsize'] = [9.0, 5.0]
+	plt.show()
+
+	sleep = input("Press any key to Continue")
+
+	decomposition = sm.tsa.seasonal_decompose(d, model = 'additive')
+	fig = decomposition.plot()
+	matplotlib.rcParams['figure.figsize'] = [9.0, 5.0]
+	plt.show()
+
+	# fig, axes = plt.subplots(1,3, figsize=(20,4), dpi=100)
+	# pd.read_csv(, parse_dates=['date'], index_col='date').plot(title='Seasonality Only', legend=False, ax=axes[1])
+	# plt.show()
 
 	
 
