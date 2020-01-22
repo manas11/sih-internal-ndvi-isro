@@ -38,8 +38,6 @@ def convert(f1,f2):
 				n=n+1
 	return (ctr)
 
-
-
 def plot(values):
 
 	a = pd.date_range(start='15/1/2017', end='15/01/2019', freq = 'M')
@@ -95,6 +93,14 @@ def plot(values):
 	print('Peaks after gaussian_filter')
 	print('Peaks after gaussian_filter = ', a[peaks_gaus])
 	print('Minimas Gaus =', a[minima_gauss])
+
+	print('Date of Sowing after Gaussian')
+	print('First = ',a[0])
+	print('Second = ', a[minima_gauss])
+	print('Date of Harvesting after Gaussian')
+	print(a[peaks_gaus])
+
+
 
 	sleep = input("Press any key to Continue")
 
