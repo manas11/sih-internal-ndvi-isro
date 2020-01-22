@@ -38,6 +38,21 @@ def convert(f1,f2):
 				ctr=ctr+j;
 	return ctr, n
 
+def peak_between_minima(list_peaks_seasonal,list_minimas_seasonal):
+	no_of_crop_cycles = 0
+	peak_start_index = 0
+	minima_start_index = 0
+	while (peak_start_index < len(list_peaks_seasonal)) and (minima_start_index < len(list_minimas_seasonal)-1):
+		if (list_peaks_seasonal[peak_start_index] >= list_minimas_seasonal[minima_start_index]) and (list_peaks_seasonal[peak_start_index] <= list_minimas_seasonal[minima_start_index+1]):
+			no_of_crop_cycles += 1
+			peak_start_index += 1
+			minima_start_index += 1
+		elif list_peaks_seasonal[peak_start_index] < list_minimas_seasonal[minima_start_index]:
+			peak_start_index += 1
+		elif list_peaks_seasonal[peak_start_index] > list_minimas_seasonal[minima_start_index + 1]:
+			minima_start_index += 1
+	print('Number of crop cycles:', no_of_crop_cycles)
+
 def plot(values):
 
 	extra = pd.date_range(start='15/1/2017', end='15/01/2019', freq = 'M')
@@ -51,13 +66,13 @@ def plot(values):
 	ax.plot(a[peaks_raw], np_values[peaks_raw], "x")
 	ax.plot(a[minima_raw], np_values[minima_raw], "o")
 	plt.show()
-	print('Raw Data')
-	print('Number of Harvests raw data = ', a[peaks_raw])
-	print('Minimas Raw =', a[minima_raw])
+	print('Raw Data:')
+	print('Dates of Harvesting:', a[peaks_raw].strftime(
+		'%d-%m-%Y').str.cat(sep=', '))
+	print('Dates of Sowing:', a[minima_raw].strftime(
+		'%d-%m-%Y').str.cat(sep=', '))
 
-	sleep = input("Press any key to Continue")
-
-
+	sleep = input("Press any key to continue")
 
 	# 20% Threshold
 	ndvis = values
@@ -73,10 +88,11 @@ def plot(values):
 	bx.plot(a[peaks_20], np_ndvis[peaks_20], "x")
 	bx.plot(a[minima_20], np_ndvis[minima_20], "o")
 	plt.show()
-	print('After 20% Threshold')
-	print('Number of Harvests after 20% Threshold = ', a[peaks_20])
-	print('Minimas 20% =', a[minima_20])
-
+	print('After applying 20% Threshold:')
+	print('Dates of Harvesting:', a[peaks_20].strftime(
+		'%d-%m-%Y').str.cat(sep=', '))
+	print('Dates of Sowing:', a[minima_20].strftime(
+		'%d-%m-%Y').str.cat(sep=', '))
 
 	sleep = input("Press any key to Continue")
 
@@ -91,23 +107,27 @@ def plot(values):
 	cx.plot(a[peaks_gaus], c_gaus[peaks_gaus], "x")
 	cx.plot(a[minima_gauss], c_gaus[minima_gauss], "o")
 	plt.show()
-	print('Peaks after gaussian_filter')
-	print('Peaks after gaussian_filter = ', a[peaks_gaus])
-	print('Minimas Gaus =', a[minima_gauss])
-
-	print('Date of Sowing after Gaussian')
-	print('First = ',a[0])
-	print('Second = ', a[minima_gauss])
-	print('Date of Harvesting after Gaussian')
-	print(a[peaks_gaus])
-
+	print('After applying Gaussian Filter:')
+	print('Dates of Harvesting:', a[peaks_gaus].strftime(
+		'%d-%m-%Y').str.cat(sep=', '))
+	print('Dates of Sowing:', a[minima_gauss].strftime(
+		'%d-%m-%Y').str.cat(sep=', '))
 
 	sleep = input("Press any key to Continue")
+
 	e = pd.Series(c_gaus_list, index=extra)
 	decomposition = sm.tsa.seasonal_decompose(e, model = 'additive')
 	fig = decomposition.seasonal.plot()
 	matplotlib.rcParams['figure.figsize'] = [9.0, 5.0]
 	plt.show()
+
+	minimas_seasonal = argrelextrema(np.array(decomposition.seasonal), np.less)
+	peaks_seasonal = crop_parameters(decomposition.seasonal)
+	
+	list_peaks_seasonal = list(peaks_seasonal)
+	list_minimas_seasonal = list(minimas_seasonal[0])
+	peak_between_minima(list_peaks_seasonal,list_minimas_seasonal)
+	sleep = input("Press any key to Continue")
 	
 
 def crop_parameters(ndvis):
@@ -116,7 +136,7 @@ def crop_parameters(ndvis):
 
 
 def main():
-	files = glob.glob("/home/stark/SIH/sih-isro/Clipped_NDVI/*")
+	files = glob.glob("../Clipped_NDVI/*")
 	files.sort()
 	n = len(files)
 	ndvis = []
