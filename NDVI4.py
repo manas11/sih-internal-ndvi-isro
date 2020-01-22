@@ -13,6 +13,9 @@ import numpy as np
 from scipy.signal import argrelextrema
 from scipy.ndimage import gaussian_filter
 import random
+from scipy.signal import find_peaks
+from scipy.signal import argrelextrema
+
 
 def convert(f1,f2):
 	#import bands as separate 1 band raster
@@ -24,10 +27,6 @@ def convert(f1,f2):
 	nir = band5.read(1).astype('float64')
 	#ndvi calculation, empty cells or nodata cells are reported as 0
 	ndvi=np.where((nir+red)==0., 0, (nir-red)/(nir+red))
-	print('----------')
-	# print(len(ndvi),'-',len(ndvi[0]))
-	# print('----------')
-	# print(ndvi)
 	ctr=0
 	n=0
 	for i in ndvi:
@@ -35,55 +34,81 @@ def convert(f1,f2):
 			if j>=0.3:
 				ctr=ctr+j;
 				n=n+1
-	print('----------')
 	return (ctr)
 
 
 
 def plot(values):
-	a = pd.DatetimeIndex(start='2017-01-15',end='2019-01-15' , freq='M')
+	# Raw Data
+	#a = pd.DatetimeIndex(start='2016-12-15',end='2018-12-15' , freq='M')
+	a = pd.date_range(start='15/1/2017', end='15/01/2019', freq = 'M')
 	b = pd.Series(values, index=a)
+	peaks_raw = crop_parameters(values)
+	np_values = np.array(values)
+	minima_raw = argrelextrema(np_values, np.less)
 	fig, ax = plt.subplots()
-	ax.plot(b.index, b, label = "line 1")
-	ndvis = values
+	ax.plot(b.index, b, label = "Raw")
+	ax.plot(a[peaks_raw], np_values[peaks_raw], "x")
+	ax.plot(a[minima_raw], np_values[minima_raw], "o")
+	plt.show()
+	print('Raw Data')
+	print('Number of Harvests raw data = ', a[peaks_raw])
+	print('Minimas Raw =', a[minima_raw])
 
+
+
+	# 20% Threshold
+	ndvis = values
 	for i in range(0,len(ndvis)-2):
 		if abs(ndvis[i+1]-ndvis[i]) <= 0.20*ndvis[i]:
 			ndvis[i+1] = ((ndvis[i] + ndvis[i+2])/2.0)
+	np_ndvis = np.array(ndvis)
+	peaks_20 = crop_parameters(ndvis)
+	minima_20 = argrelextrema(np_ndvis, np.less)
 	c = pd.Series(ndvis, index=a)
-	ax.plot(c.index, c, label = "line 2")
-	c_gaus = gaussian_filter(c, sigma=1.2)
-	ax.plot(c.index, c, label="line 2")
-	ax.plot(c.index, c_gaus, label="line 3")
-	# t = [random.random()*1000 for _ in range(24)]
-	# d = pd.Series(t, index=a)
-	# ax.plot(d.index, d, label = "line 3")
-	ax.legend()
-
-	ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+	fig, bx = plt.subplots()
+	bx.plot(c.index, c, label = "20%")
+	bx.plot(a[peaks_20], np_ndvis[peaks_20], "x")
+	bx.plot(a[minima_20], np_ndvis[minima_20], "o")
 	plt.show()
-	tf= np.array(ndvis)
-	print(tf)
+	print('After 20% Threshold')
+	print('Number of Harvests after 20% Threshold = ', a[peaks_20])
+	print('Minimas 20% =', a[minima_20])
 
 
-def smooth(y, box_pts):
-	box = np.ones(box_pts)/box_pts
-	y_smooth = np.convolve(y, box, mode='same')
-	return y_smooth
+	# Applying Gaussian Distribution
+	c_gaus = gaussian_filter(c, sigma=1.3)
+	c_gaus_list = c_gaus.tolist()
+	minima_gauss = argrelextrema(np.array(c_gaus_list), np.less)
+	peaks_gaus = crop_parameters(c_gaus_list)
+	fig, cx = plt.subplots()
+	cx.plot(c.index, c_gaus_list, label="Gaussian")
+	cx.plot(a[peaks_gaus], c_gaus[peaks_gaus], "x")
+	cx.plot(a[minima_gauss], c_gaus[minima_gauss], "o")
+	plt.show()
+	print('Peaks after gaussian_filter')
+	print('Peaks after gaussian_filter = ', a[peaks_gaus])
+	print('Minimas Gaus =', a[minima_gauss])
+
+
 	
 
+
+def crop_parameters(ndvis):
+	peaks, _ = find_peaks(ndvis, height=0)
+	return peaks
+
+
 def main():
-	files = glob.glob("/home/bharath/Desktop/Clipped_NDVI/*")
+	files = glob.glob("/home/stark/SIH/sih-isro/Clipped_NDVI/*")
 	files.sort()
-	print(files)
 	n = len(files)
 	ndvis = []
+	print('PROCESSING FILES AND CONVERTING IT TO NDVI')
 	for i in range(0,n,2):
-		print('Files are = ',files[i],files[i+1])
+		# print('Files are = ',files[i],files[i+1])
 		ndvis.append(convert(files[i],files[i+1]))
 
-	print("NDVI VALUES")		
-	print(ndvis)
 	plot(ndvis)
 	print('-----')
 	
