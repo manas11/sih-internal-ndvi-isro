@@ -101,34 +101,13 @@ def plot(values):
 	print(a[peaks_gaus])
 
 
-
-	sleep = input("Press any key to Continue")
-
-	decomposition = sm.tsa.seasonal_decompose(b, model = 'additive')
-	fig = decomposition.plot()
-	matplotlib.rcParams['figure.figsize'] = [9.0, 5.0]
-	plt.show()
-
-	sleep = input("Press any key to Continue")
-
-	decomposition = sm.tsa.seasonal_decompose(c, model = 'additive')
-	fig = decomposition.plot()
-	matplotlib.rcParams['figure.figsize'] = [9.0, 5.0]
-	plt.show()
-
 	sleep = input("Press any key to Continue")
 
 	decomposition = sm.tsa.seasonal_decompose(d, model = 'additive')
-	fig = decomposition.plot()
+	fig = decomposition.seasonal.plot()
 	matplotlib.rcParams['figure.figsize'] = [9.0, 5.0]
 	plt.show()
-
-	# fig, axes = plt.subplots(1,3, figsize=(20,4), dpi=100)
-	# pd.read_csv(, parse_dates=['date'], index_col='date').plot(title='Seasonality Only', legend=False, ax=axes[1])
-	# plt.show()
-
 	
-
 
 def crop_parameters(ndvis):
 	peaks, _ = find_peaks(ndvis, height=0)
