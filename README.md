@@ -13,9 +13,9 @@ Team Number: T10
 Team Name: nitkians120120
 
 Team Members:
-- Yuvraj Dalia (171IT153) (Team Leader)
-- Vithik Shah (171IT151)
-- Adikar Bharath N V S (171IT202)
-- Manas Gupta (171CO122)
-- Abha Wadjikar (171CO102)
-- Sharmila Biswas (171CO143)
+- Yuvraj Dalia (Team Leader)
+- Vithik Shah
+- Adikar Bharath N V S
+- Manas Gupta
+- Abha Wadjikar
+- Sharmila Biswas
